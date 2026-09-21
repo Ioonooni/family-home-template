@@ -2,18 +2,29 @@ import "./styles.css";
 import { publicConfig } from "./config/publicConfig.js";
 import { CATEGORIES, PRIORITY_STYLE, filterTasks, localDateString, summarizeTasks, urgencyFor } from "./domain/task.js";
 import { supabaseClient } from "./adapters/supabaseClient.js";
+import { createAuthService } from "./adapters/authService.js";
 import { createTaskRepository } from "./adapters/taskRepository.js";
 import { createAttachmentStorage } from "./adapters/attachmentStorage.js";
 import { createPushSubscriptionRepository } from "./adapters/pushSubscriptionRepository.js";
 import { createTaskService } from "./application/taskService.js";
 import { initializePushNotifications } from "./application/pushNotifications.js";
-import { escapeHtml, safeHttpsUrl } from "./ui/escape.js";
+import { escapeHtml } from "./ui/escape.js";
 
+const authService = createAuthService(supabaseClient);
 const repository = createTaskRepository(supabaseClient);
 const attachmentStorage = createAttachmentStorage(supabaseClient);
 const taskService = createTaskService({ repository, attachmentStorage });
 
 const elements = {
+  authScreen: document.getElementById("auth-screen"),
+  authForm: document.getElementById("auth-form"),
+  authEmail: document.getElementById("auth-email"),
+  authPassword: document.getElementById("auth-password"),
+  authMessage: document.getElementById("auth-message"),
+  signUpButton: document.getElementById("auth-sign-up"),
+  appShell: document.getElementById("app-shell"),
+  authUser: document.getElementById("auth-user"),
+  signOutButton: document.getElementById("btn-sign-out"),
   list: document.getElementById("task-list"),
   empty: document.getElementById("empty-state"),
   loading: document.getElementById("loading-state"),
@@ -31,12 +42,14 @@ const elements = {
 };
 
 const state = {
+  session: null,
+  unsubscribeTasks: null,
   tasks: [],
   filter: "all",
   search: "",
   categories: new Set(),
   removeAttachment: false,
-  previousAttachmentUrl: null,
+  previousAttachmentPath: null,
 };
 
 function updateExpiryVisibility() {
@@ -85,7 +98,7 @@ function taskCardHtml(task) {
           <span class="text-[11px] px-2 py-0.5 rounded-full ${category.color}">${category.icon} ${category.label}</span>
           ${task.duedate ? `<span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">📅 ${escapeHtml(task.duedate)}</span>` : ""}
           ${task.expiry_date ? `<span class="text-[11px] px-2 py-0.5 rounded-full bg-[#FDE0E6] text-[#C2506A]">⏳ หมดอายุ ${escapeHtml(task.expiry_date)}</span>` : ""}
-          ${task.attachment_url ? '<span class="text-[11px] px-2 py-0.5 rounded-full bg-[#DCE6FA] text-[#5B6FA8]">📎 มีไฟล์แนบ</span>' : ""}
+          ${task.attachment_path ? '<span class="text-[11px] px-2 py-0.5 rounded-full bg-[#DCE6FA] text-[#5B6FA8]">📎 มีไฟล์แนบ</span>' : ""}
           <span class="text-[11px] px-2 py-0.5 rounded-full ${priority.className}">${priority.label}</span>
         </span>
       </button>
@@ -116,6 +129,7 @@ function showLoadError(error) {
 }
 
 async function refreshTasks() {
+  if (!state.session) return;
   elements.loading.classList.remove("hidden");
   try {
     state.tasks = await taskService.list();
@@ -131,7 +145,7 @@ async function refreshTasks() {
 
 function resetAttachmentUi() {
   state.removeAttachment = false;
-  state.previousAttachmentUrl = null;
+  state.previousAttachmentPath = null;
   elements.file.value = "";
   elements.attachmentExisting.classList.add("hidden");
   elements.attachmentLink.removeAttribute("href");
@@ -162,7 +176,7 @@ function openNewTask() {
   openModal();
 }
 
-function openEditTask(task) {
+async function openEditTask(task) {
   document.getElementById("modal-title").textContent = "แก้ไขงาน";
   document.getElementById("task-id").value = task.id;
   document.getElementById("f-title").value = task.title || "";
@@ -172,11 +186,11 @@ function openEditTask(task) {
   document.getElementById("f-expiry").value = task.expiry_date || "";
   document.getElementById("f-note").value = task.details?.note || "";
   resetAttachmentUi();
-  state.previousAttachmentUrl = task.attachment_url || null;
-  const attachmentUrl = safeHttpsUrl(task.attachment_url);
-  if (attachmentUrl) {
-    elements.attachmentLink.href = attachmentUrl;
-    elements.attachmentLink.textContent = "📎 ไฟล์ที่แนบไว้ (แตะเพื่อเปิด)";
+  state.previousAttachmentPath = task.attachment_path || null;
+  if (task.attachment_path) {
+    const signedUrl = await taskService.attachmentUrl(task.attachment_path);
+    elements.attachmentLink.href = signedUrl;
+    elements.attachmentLink.textContent = "📎 ไฟล์ที่แนบไว้ (ลิงก์ชั่วคราว)";
     elements.attachmentExisting.classList.remove("hidden");
   }
   updateExpiryVisibility();
@@ -195,6 +209,64 @@ function formPayload() {
   };
 }
 
+async function enterAuthenticatedApp(session) {
+  state.session = session;
+  elements.authMessage.textContent = "";
+  elements.authScreen.classList.add("hidden");
+  elements.appShell.classList.remove("hidden");
+  elements.authUser.textContent = session.user.email || "";
+  state.unsubscribeTasks?.();
+  state.unsubscribeTasks = taskService.subscribe(refreshTasks);
+  initializePushNotifications({
+    button: elements.notificationButton,
+    vapidPublicKey: publicConfig.vapidPublicKey,
+    subscriptionRepository: createPushSubscriptionRepository(supabaseClient),
+  });
+  await refreshTasks();
+}
+
+function leaveAuthenticatedApp() {
+  state.session = null;
+  state.tasks = [];
+  state.unsubscribeTasks?.();
+  state.unsubscribeTasks = null;
+  elements.appShell.classList.add("hidden");
+  elements.authScreen.classList.remove("hidden");
+  elements.authUser.textContent = "";
+  renderStats();
+  renderList();
+}
+
+elements.authForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  elements.authMessage.textContent = "กำลังเข้าสู่ระบบ...";
+  try {
+    const session = await authService.signIn(elements.authEmail.value.trim(), elements.authPassword.value);
+    await enterAuthenticatedApp(session);
+  } catch (error) {
+    elements.authMessage.textContent = `เข้าสู่ระบบไม่สำเร็จ: ${error.message}`;
+  }
+});
+
+elements.signUpButton.addEventListener("click", async () => {
+  if (!elements.authForm.reportValidity()) return;
+  elements.authMessage.textContent = "กำลังสมัครบัญชี...";
+  try {
+    const data = await authService.signUp(elements.authEmail.value.trim(), elements.authPassword.value);
+    elements.authMessage.textContent = data.session
+      ? "สมัครสำเร็จและเข้าสู่ระบบแล้ว"
+      : "สมัครสำเร็จ กรุณาตรวจอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ";
+    if (data.session) await enterAuthenticatedApp(data.session);
+  } catch (error) {
+    elements.authMessage.textContent = `สมัครบัญชีไม่สำเร็จ: ${error.message}`;
+  }
+});
+
+elements.signOutButton.addEventListener("click", async () => {
+  await authService.signOut();
+  leaveAuthenticatedApp();
+});
+
 elements.form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const submitButton = elements.form.querySelector('button[type="submit"]');
@@ -206,7 +278,7 @@ elements.form.addEventListener("submit", async (event) => {
       id,
       payload: formPayload(),
       file: elements.file.files[0],
-      previousAttachmentUrl: state.previousAttachmentUrl,
+      previousAttachmentPath: state.previousAttachmentPath,
       removeAttachment: state.removeAttachment,
     });
     closeModal();
@@ -225,7 +297,7 @@ elements.list.addEventListener("click", async (event) => {
   const task = state.tasks.find((item) => String(item.id) === button.dataset.id);
   if (!task) return;
   try {
-    if (button.dataset.action === "edit") openEditTask(task);
+    if (button.dataset.action === "edit") await openEditTask(task);
     if (button.dataset.action === "toggle") {
       await taskService.updateStatus(task.id, task.status === "done" ? "pending" : "done");
       await refreshTasks();
@@ -284,10 +356,9 @@ document.getElementById("btn-remove-attachment").addEventListener("click", () =>
 
 renderCategoryControls();
 updateExpiryVisibility();
-initializePushNotifications({
-  button: elements.notificationButton,
-  vapidPublicKey: publicConfig.vapidPublicKey,
-  subscriptionRepository: createPushSubscriptionRepository(supabaseClient),
+authService.subscribe((session) => {
+  if (!session && state.session) leaveAuthenticatedApp();
 });
-taskService.subscribe(refreshTasks);
-refreshTasks();
+
+const initialSession = await authService.getSession();
+if (initialSession) await enterAuthenticatedApp(initialSession);
