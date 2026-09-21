@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>นโยบายความเป็นส่วนตัว — งานบ้านของเรา</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body class="min-h-screen bg-[#FAF5EC] text-[#33314A]">
+  <header class="bg-gradient-to-br from-[#8B9EE0] via-[#7B8FD4] to-[#A78BD1] px-5 py-8 text-white">
+    <div class="mx-auto max-w-3xl">
+      <a href="/" class="inline-flex min-h-11 items-center text-sm text-white/90">← กลับหน้าหลัก</a>
+      <p class="mt-1 text-sm text-white/75">งานบ้านของเรา</p>
+      <h1 class="text-2xl font-bold">นโยบายความเป็นส่วนตัว</h1>
+      <p class="mt-2 text-sm text-white/85">มีผลตั้งแต่วันที่ 21 กันยายน 2569</p>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-3xl space-y-5 px-4 py-6">
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">1. ขอบเขตของนโยบาย</h2>
+      <p class="mt-2 text-sm leading-7 text-gray-700">
+        นโยบายนี้อธิบายการจัดการข้อมูลของเว็บแอป “งานบ้านของเรา” ซึ่งประกอบด้วยโมดูลงานบ้านและโมดูลการเงิน
+        แอปใช้ข้อมูลเท่าที่จำเป็นต่อการทำงานของแต่ละโมดูล
+      </p>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">2. ข้อมูลที่แอปใช้</h2>
+      <div class="mt-3 space-y-3 text-sm leading-7 text-gray-700">
+        <p><strong>โมดูลงานบ้าน:</strong> ข้อมูลงาน รายละเอียดงาน สถานะ กำหนดเวลา ไฟล์แนบ และข้อมูลที่จำเป็นสำหรับการแจ้งเตือน ถูกส่งไปยังบริการ Supabase ที่กำหนดไว้สำหรับโมดูลนี้</p>
+        <p><strong>โมดูลการเงิน:</strong> รายการรายรับ/รายจ่ายและข้อมูลกำกับใบเสร็จถูกบันทึกใน Google Sheets และไฟล์ใบเสร็จถูกบันทึกใน Google Drive ของบัญชี Google ที่ผู้ใช้เลือกเชื่อมต่อ</p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">3. การเข้าถึง Google Drive และ Google Sheets</h2>
+      <div class="mt-3 space-y-3 text-sm leading-7 text-gray-700">
+        <p>
+          แอปขอสิทธิ์ Google OAuth เฉพาะขอบเขต
+          <code class="break-all rounded bg-gray-100 px-1 py-0.5 text-xs">https://www.googleapis.com/auth/drive.file</code>
+          เพื่อสร้างและจัดการไฟล์การเงินที่แอปสร้างหรือที่ผู้ใช้อนุญาตให้แอปใช้งาน
+        </p>
+        <p>แอปไม่ขอสิทธิ์อ่าน Google Drive ทั้งบัญชี และไม่ขอรหัสผ่าน Google ของผู้ใช้</p>
+        <p>Google access token ถูกเก็บไว้ในหน่วยความจำของหน้าเว็บขณะใช้งานเท่านั้น และไม่ได้ถูกบันทึกลง localStorage, sessionStorage, cookie หรือ repository ของโปรเจกต์</p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">4. วัตถุประสงค์การใช้ข้อมูล</h2>
+      <p class="mt-2 text-sm leading-7 text-gray-700">
+        ข้อมูลถูกใช้เพื่อแสดง บันทึก แก้ไข ลบ และซิงก์งานหรือรายการการเงินตามคำสั่งของผู้ใช้ รวมถึงแสดงรูปใบเสร็จและสถานะที่เกี่ยวข้อง
+        แอปไม่ใช้ข้อมูล Google ของผู้ใช้เพื่อการโฆษณา และไม่ขายข้อมูลผู้ใช้
+      </p>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">5. การเปิดเผยข้อมูล</h2>
+      <p class="mt-2 text-sm leading-7 text-gray-700">
+        แอปไม่ส่งต่อข้อมูล Google ของผู้ใช้ให้บุคคลภายนอกเพื่อการตลาดหรือโฆษณา
+        ข้อมูลอาจถูกประมวลผลโดยผู้ให้บริการโครงสร้างพื้นฐานที่จำเป็นต่อการทำงานของแอป เช่น Google, Supabase และ Vercel ตามหน้าที่ของบริการนั้น ๆ
+      </p>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">6. การเก็บรักษาและการลบข้อมูล</h2>
+      <div class="mt-3 space-y-3 text-sm leading-7 text-gray-700">
+        <p><strong>Finance:</strong> ผู้ใช้ควบคุมไฟล์และข้อมูลที่อยู่ใน Google Drive/Sheets ของบัญชีตนเอง สามารถลบรายการผ่านแอป หรือลบไฟล์/ชีตใน Google Drive ของตนเองได้</p>
+        <p><strong>Task:</strong> ข้อมูลงานและไฟล์แนบจะคงอยู่ในระบบจนกว่าจะถูกลบผ่านฟังก์ชันของแอปหรือถูกลบจากบริการที่ใช้จัดเก็บ</p>
+        <p>ผู้ใช้สามารถเพิกถอนสิทธิ์ของแอปต่อบัญชี Google ได้จากการตั้งค่าความปลอดภัยของบัญชี Google</p>
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">7. ความปลอดภัย</h2>
+      <p class="mt-2 text-sm leading-7 text-gray-700">
+        แอปใช้งานผ่าน HTTPS ใน production และออกแบบให้ขอสิทธิ์เท่าที่จำเป็น
+        ผู้ใช้ควรปกป้องบัญชี Google และอุปกรณ์ของตนเอง และไม่ควรแชร์ข้อมูลรับรองบัญชีกับบุคคลอื่น
+      </p>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">8. การเปลี่ยนแปลงนโยบาย</h2>
+      <p class="mt-2 text-sm leading-7 text-gray-700">
+        หากวิธีเก็บ ใช้ หรือแบ่งปันข้อมูลเปลี่ยนอย่างมีนัยสำคัญ นโยบายนี้จะได้รับการปรับปรุงให้สอดคล้องกับการทำงานจริงของแอปก่อนนำการเปลี่ยนแปลงนั้นไปใช้
+      </p>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">9. ติดต่อ</h2>
+      <p class="mt-2 text-sm leading-7 text-gray-700">
+        หากมีคำถามเกี่ยวกับความเป็นส่วนตัวหรือการใช้ข้อมูล โปรดติดต่อผ่านอีเมลสนับสนุนที่แสดงในหน้าการอนุญาต Google OAuth ของแอป
+      </p>
+    </section>
+
+    <p class="pb-4 text-center text-xs text-gray-500">
+      Privacy Policy — งานบ้านของเรา
+    </p>
+  </main>
+</body>
+</html>

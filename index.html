@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>งานบ้าน - Family Tasks</title>
+<link rel="stylesheet" href="/src/styles.css">
+</head>
+<body class="bg-[#FAF5EC] min-h-screen text-[#33314A] pb-28">
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+<header class="bg-gradient-to-br from-[#8B9EE0] via-[#7B8FD4] to-[#A78BD1] text-white px-5 pt-6 pb-8 rounded-b-3xl shadow-sm">
+  <div class="flex items-start justify-between">
+    <div>
+      <h1 class="text-xl font-bold">🏡 งานบ้านของเรา</h1>
+      <p class="text-sm text-white/80 mt-0.5">จัดการงานบ้านแบบง่าย ๆ สำหรับทุกคนในครอบครัว</p>
+    </div>
+    <div class="flex flex-col items-end gap-2">
+      <a href="/finance/" class="shrink-0 bg-white text-[#6F7FC4] text-xs font-semibold px-3 py-2 rounded-full shadow-sm">
+        💰 การเงิน
+      </a>
+      <button id="btn-notify" class="shrink-0 bg-white/15 text-white text-xs px-3 py-2 rounded-full border border-white/30">
+        🔔 เปิดแจ้งเตือน
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     DASHBOARD SUMMARY (งานวันนี้ / 7 วัน / ยังไม่เสร็จ)
+============================================================ -->
+<section class="px-4 -mt-5">
+  <div class="grid grid-cols-3 gap-2">
+    <div class="bg-white rounded-2xl shadow p-3 text-center">
+      <p id="stat-today" class="text-2xl font-bold text-[#7B8FD4]">0</p>
+      <p class="text-[11px] text-gray-500 mt-0.5">วันนี้</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-3 text-center">
+      <p id="stat-tomorrow" class="text-2xl font-bold text-[#6FA8D8]">0</p>
+      <p class="text-[11px] text-gray-500 mt-0.5">พรุ่งนี้</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-3 text-center">
+      <p id="stat-week" class="text-2xl font-bold text-[#F0935E]">0</p>
+      <p class="text-[11px] text-gray-500 mt-0.5">ใน 7 วัน</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-3 gap-2 mt-2">
+    <div class="bg-white rounded-2xl shadow p-3 text-center">
+      <p id="stat-month" class="text-2xl font-bold text-[#A78BD1]">0</p>
+      <p class="text-[11px] text-gray-500 mt-0.5">ใน 30 วัน</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-3 text-center">
+      <p id="stat-expiring" class="text-2xl font-bold text-[#E8607A]">0</p>
+      <p class="text-[11px] text-gray-500 mt-0.5">ใกล้หมดอายุ</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow p-3 text-center">
+      <p id="stat-pending" class="text-2xl font-bold text-[#8A87A8]">0</p>
+      <p class="text-[11px] text-gray-500 mt-0.5">ยังไม่เสร็จ</p>
+    </div>
+  </div>
+</section>
+
+<section class="px-4 mt-4">
+  <div class="relative">
+    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+    <input id="search-input" type="text" placeholder="ค้นหางาน หมวดหมู่ หรือรายละเอียด..."
+      class="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-white text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7B8FD4]">
+  </div>
+</section>
+
+<!-- ============================================================
+     FILTER TABS
+============================================================ -->
+<section class="px-4 mt-3">
+  <div class="flex gap-2 overflow-x-auto pb-1">
+    <button data-filter="all" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-[#7B8FD4] text-white">ทั้งหมด</button>
+    <button data-filter="today" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white text-gray-600 border border-gray-200">วันนี้</button>
+    <button data-filter="tomorrow" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white text-gray-600 border border-gray-200">พรุ่งนี้</button>
+    <button data-filter="week" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white text-gray-600 border border-gray-200">7 วัน</button>
+    <button data-filter="month" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white text-gray-600 border border-gray-200">30 วัน</button>
+    <button data-filter="expiring" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white text-gray-600 border border-gray-200">ใกล้หมดอายุ</button>
+    <button data-filter="pending" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white text-gray-600 border border-gray-200">ยังไม่เสร็จ</button>
+    <button data-filter="done" class="filter-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-medium bg-white text-gray-600 border border-gray-200">เสร็จแล้ว</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     CATEGORY FILTER (เลือกได้หลายหมวดพร้อมกัน)
+============================================================ -->
+<section class="px-4 mt-2">
+  <div id="category-chips" class="flex gap-2 overflow-x-auto pb-1">
+    <!-- เติมจาก JS โดยอิงจาก CATEGORIES -->
+  </div>
+</section>
+
+<!-- ============================================================
+     TASK LIST
+============================================================ -->
+<main class="px-4 mt-4">
+  <div id="task-list" class="space-y-2.5"></div>
+
+
+  <!-- Empty state -->
+  <div id="empty-state" class="hidden text-center py-16">
+    <p class="text-4xl mb-2">🌿</p>
+    <p class="text-gray-500 text-sm">ยังไม่มีงานในหมวดนี้</p>
+  </div>
+
+  <!-- Loading state -->
+  <div id="loading-state" class="text-center py-16 text-gray-400 text-sm">กำลังโหลดงาน...</div>
+</main>
+
+<!-- ============================================================
+     FLOATING ADD BUTTON
+============================================================ -->
+<button id="btn-add" class="fixed bottom-6 right-5 bg-gradient-to-br from-[#7B8FD4] to-[#A78BD1] text-white w-16 h-16 rounded-full shadow-lg text-3xl flex items-center justify-center active:scale-95 transition">
+  +
+</button>
+
+<!-- ============================================================
+     ADD / EDIT MODAL
+============================================================ -->
+<div id="modal-backdrop" class="hidden fixed inset-0 bg-black/40 z-40"></div>
+<div id="modal" class="hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl p-5 pb-8 max-w-lg mx-auto">
+  <div class="w-10 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+  <h2 id="modal-title" class="text-lg font-bold mb-4">เพิ่มงานใหม่</h2>
+
+  <form id="task-form" class="space-y-3">
+    <input type="hidden" id="task-id">
+
+    <div>
+      <label class="text-xs font-medium text-gray-500">ชื่องาน *</label>
+      <input id="f-title" type="text" required placeholder="เช่น ล้างจาน"
+        class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-[#7B8FD4]">
+    </div>
+
+    <div>
+      <label class="text-xs font-medium text-gray-500">หมวดหมู่</label>
+      <select id="f-category" class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-[#7B8FD4]">
+        <!-- ตัวเลือกถูกเติมจาก JS โดยอิงจาก CATEGORIES ด้านล่าง -->
+      </select>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs font-medium text-gray-500">กำหนดเสร็จ</label>
+        <input id="f-duedate" type="date"
+          class="w-full mt-1 px-3 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-[#7B8FD4]">
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-500">ความสำคัญ</label>
+        <select id="f-priority" class="w-full mt-1 px-3 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-[#7B8FD4]">
+          <option value="low">ต่ำ</option>
+          <option value="medium" selected>ปานกลาง</option>
+          <option value="high">สูง</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ฟิลด์ "วันหมดอายุ" โผล่เฉพาะหมวดที่มีของหมดอายุ (เอกสาร/รถยนต์/ทรัพย์สิน) -->
+    <div id="f-expiry-wrap" class="hidden">
+      <label class="text-xs font-medium text-gray-500">วันหมดอายุ (ถ้ามี)</label>
+      <input id="f-expiry" type="date"
+        class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-[#7B8FD4]">
+    </div>
+
+    <div>
+      <label class="text-xs font-medium text-gray-500">รายละเอียดเพิ่มเติม</label>
+      <textarea id="f-note" rows="2" placeholder="เช่น เลขทะเบียนรถ, เลขที่กรมธรรม์, หมายเหตุอื่น ๆ"
+        class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-base focus:outline-none focus:ring-2 focus:ring-[#7B8FD4] resize-none"></textarea>
+    </div>
+
+    <!-- แนบไฟล์/รูปภาพ (เช่น ผลตรวจ, ใบเสร็จ, สำเนาเอกสาร) -->
+    <div>
+      <label class="text-xs font-medium text-gray-500">แนบไฟล์หรือรูปภาพ</label>
+      <input id="f-file" type="file" accept="image/*,application/pdf"
+        class="w-full mt-1 text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-[#7B8FD4] file:text-white">
+      <!-- แสดงไฟล์ที่แนบไว้เดิม (ตอนแก้ไขงาน) -->
+      <div id="f-attachment-existing" class="hidden mt-2 flex items-center gap-2 bg-gray-50 rounded-xl p-2">
+        <a id="f-attachment-link" href="#" target="_blank" class="text-sm text-[#7B8FD4] underline truncate flex-1">📎 ไฟล์แนบ</a>
+        <button type="button" id="btn-remove-attachment" class="text-red-500 text-xs shrink-0">ลบไฟล์</button>
+      </div>
+      <p id="f-upload-status" class="text-xs text-gray-400 mt-1"></p>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <button type="button" id="btn-cancel" class="flex-1 py-3 rounded-xl border border-gray-200 font-medium text-gray-600">ยกเลิก</button>
+      <button type="submit" class="flex-1 py-3 rounded-xl bg-[#7B8FD4] text-white font-medium">บันทึก</button>
+    </div>
+  </form>
+</div>
+
+<footer class="px-4 pb-6 text-center text-xs text-gray-500">
+  <div><a href="/privacy/" class="underline underline-offset-2">นโยบายความเป็นส่วนตัว</a></div>
+  <div class="mt-1">Created by IOON</div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
