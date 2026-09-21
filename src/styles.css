@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: -apple-system, "Noto Sans Thai", "Segoe UI", sans-serif;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #d8d4ec; border-radius: 999px; }
+
+button,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+.icon-touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
