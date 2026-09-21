@@ -21,6 +21,20 @@ create table if not exists public.tasks (
 
 create index if not exists tasks_owner_duedate_idx on public.tasks (owner_id, duedate);
 
+do $
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'tasks'
+  ) then
+    alter publication supabase_realtime add table public.tasks;
+  end if;
+end
+$;
+
 alter table public.tasks enable row level security;
 
 drop policy if exists "users read own tasks" on public.tasks;
