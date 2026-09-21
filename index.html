@@ -7,6 +7,26 @@
 <link rel="stylesheet" href="/src/styles.css">
 </head>
 <body class="bg-[#FAF5EC] min-h-screen text-[#33314A] pb-28">
+<section id="auth-screen" class="fixed inset-0 z-[100] bg-[#FAF5EC] px-5 py-10 flex items-center justify-center">
+  <div class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-lg">
+    <p class="text-3xl text-center mb-2">🏡</p>
+    <h1 class="text-xl font-bold text-center">งานบ้านของเรา</h1>
+    <p class="mt-1 text-center text-sm text-gray-500">เข้าสู่ระบบเพื่อดูและจัดการงานของคุณ</p>
+    <form id="auth-form" class="mt-6 space-y-3">
+      <label class="block text-xs font-medium text-gray-500">อีเมล
+        <input id="auth-email" type="email" required autocomplete="email" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base">
+      </label>
+      <label class="block text-xs font-medium text-gray-500">รหัสผ่าน
+        <input id="auth-password" type="password" required minlength="6" autocomplete="current-password" class="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base">
+      </label>
+      <p id="auth-message" class="min-h-5 text-xs text-gray-500" role="status"></p>
+      <button type="submit" class="w-full min-h-12 rounded-xl bg-[#7B8FD4] font-semibold text-white">เข้าสู่ระบบ</button>
+      <button id="auth-sign-up" type="button" class="w-full min-h-12 rounded-xl border border-[#7B8FD4] font-semibold text-[#6F7FC4]">สมัครบัญชี</button>
+    </form>
+    <p class="mt-5 text-center text-[11px] text-gray-400">Created by IOON</p>
+  </div>
+</section>
+<div id="app-shell" class="hidden">
 
 <!-- ============================================================
      HEADER
@@ -24,6 +44,8 @@
       <button id="btn-notify" class="shrink-0 bg-white/15 text-white text-xs px-3 py-2 rounded-full border border-white/30">
         🔔 เปิดแจ้งเตือน
       </button>
+      <span id="auth-user" class="max-w-36 truncate text-[10px] text-white/75"></span>
+      <button id="btn-sign-out" type="button" class="shrink-0 text-[11px] text-white underline underline-offset-2">ออกจากระบบ</button>
     </div>
   </div>
 </header>
@@ -197,6 +219,7 @@
   <div class="mt-1">Created by IOON</div>
 </footer>
 
+</div>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>

@@ -11,13 +11,14 @@ export function createTaskService({ repository, attachmentStorage }) {
     list: () => repository.list(),
     subscribe: (onChange) => repository.subscribe(onChange),
     updateStatus: (id, status) => repository.updateStatus(id, status),
-    async save({ id, payload, file, previousAttachmentUrl, removeAttachment }) {
+    attachmentUrl: (path) => attachmentStorage.signedUrl(path),
+    async save({ id, payload, file, previousAttachmentPath, removeAttachment }) {
       let uploaded = null;
       if (file) {
         uploaded = await attachmentStorage.upload(file);
-        payload.attachment_url = uploaded.publicUrl;
+        payload.attachment_path = uploaded.path;
       } else if (removeAttachment) {
-        payload.attachment_url = null;
+        payload.attachment_path = null;
       }
 
       try {
@@ -28,14 +29,14 @@ export function createTaskService({ repository, attachmentStorage }) {
         throw error;
       }
 
-      if (previousAttachmentUrl && (uploaded || removeAttachment)) {
-        await bestEffort(() => attachmentStorage.removeByPublicUrl(previousAttachmentUrl));
+      if (previousAttachmentPath && (uploaded || removeAttachment)) {
+        await bestEffort(() => attachmentStorage.removeByPath(previousAttachmentPath));
       }
     },
     async delete(task) {
       await repository.delete(task.id);
-      if (task.attachment_url) {
-        await bestEffort(() => attachmentStorage.removeByPublicUrl(task.attachment_url));
+      if (task.attachment_path) {
+        await bestEffort(() => attachmentStorage.removeByPath(task.attachment_path));
       }
     },
   };

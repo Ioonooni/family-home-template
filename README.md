@@ -14,7 +14,7 @@ Created by IOON.
 
 ## โมดูล
 
-- **Task** — ใช้ Supabase สำหรับ task data, attachment และ push subscription
+- **Task** — ใช้ Supabase Auth + RLS สำหรับ task data, private attachment และ push subscription โดยข้อมูลแยกตามบัญชีผู้ใช้
 - **Finance** — รายรับ/รายจ่ายครอบครัวและธุรกิจ
   - Transactions + receipt metadata → Google Sheets
   - Receipt files → Google Drive
@@ -38,15 +38,21 @@ VITE_GOOGLE_CLIENT_ID=YOUR_GOOGLE_OAUTH_WEB_CLIENT_ID
 
 ค่า `VITE_*` ทั้งหมดเป็น browser-visible configuration เท่านั้น ห้ามใส่ `service_role`, OAuth client secret, VAPID private key, access token, refresh token, private key หรือ credential อื่น
 
-## Supabase ที่ต้องมี
+## Supabase setup สำหรับ Task
 
-Task module ต้องใช้ resource ต่อไปนี้ใน Supabase ของผู้ deploy:
+1. สร้าง Supabase project ของผู้ deploy เอง
+2. เปิด Email/Password authentication ใน Supabase Auth
+3. เปิด SQL Editor แล้วรันไฟล์ `supabase/setup.sql`
+4. นำ Project URL และ publishable key ไปตั้งใน environment
+5. ทดสอบสมัครบัญชี → ยืนยันอีเมล (ถ้าเปิด Confirm email) → เข้าสู่ระบบ → CRUD Task → แนบ/เปิด/ลบไฟล์
 
-- table `tasks`
-- table `push_subscriptions` หากเปิดใช้ push notification
-- storage bucket `attachments`
+`supabase/setup.sql` จะสร้าง:
+- `tasks` พร้อม `owner_id` และ Row Level Security
+- `push_subscriptions` พร้อม RLS แยกตามผู้ใช้
+- private storage bucket `attachments`
+- Storage policies ที่อนุญาตเฉพาะโฟลเดอร์ของ `auth.uid()`
 
-Schema, policy และ server-side notification infrastructure ต้องตั้งให้ตรงกับ implementation ของ instance ก่อนนำไปใช้งานจริง หาก repository ยังไม่มี migration/bootstrap สำหรับส่วนนี้ ให้ถือว่ายังไม่ใช่ zero-to-running template สำหรับ Task module
+Task UI จะไม่โหลดหรือ subscribe ข้อมูลจนกว่าจะมี authenticated session และไฟล์แนบใช้ signed URL ชั่วคราวแทน public URL
 
 ## Google OAuth
 
@@ -90,6 +96,7 @@ Production build ใช้ Vite และ output ที่ `dist/`.
 - ไม่มี secrets หรือ private data ใน working tree และ history ที่เกี่ยวข้อง
 - ผู้ใช้สำเนาเชื่อมต่อ service/data ของตัวเอง
 - public demo ไม่เขียนข้อมูลจริงของเจ้าของโปรเจกต์
+- Task backend ต้องใช้ Supabase ของผู้ deploy เองและเปิด RLS ตาม `supabase/setup.sql`
 - production config ของเจ้าของไม่ถูกฝังใน reusable source
 
 ## License
