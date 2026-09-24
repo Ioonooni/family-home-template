@@ -44,7 +44,7 @@ export function createGoogleDriveReceiptStorage({ fetchApi = fetch, urlApi = URL
       const metadata = {
         name: file.name || receipt.name || "receipt",
         parents: [folderId],
-        appProperties: { product: "family-home-finance", resource: "receipt", transactionId },
+        appProperties: { product: "family-task-finance", resource: "receipt", transactionId },
       };
       const start = await checked(await fetchApi(
         `${DRIVE_UPLOAD_URL}?uploadType=resumable&fields=id,name,mimeType,size`,
