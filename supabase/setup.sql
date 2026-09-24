@@ -1,4 +1,4 @@
--- Supabase bootstrap for the public family-home template.
+-- Supabase bootstrap for the public family-task-template.
 -- Run this in a NEW Supabase project owned by the deployer.
 -- Do not run it against someone else's production project.
 
