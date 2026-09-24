@@ -28,7 +28,7 @@ describe("Google Drive receipt storage", () => {
     });
     const metadata = JSON.parse(fetchApi.mock.calls[0][1].body);
     expect(metadata.parents).toEqual(["finance-folder"]);
-    expect(metadata.appProperties).toMatchObject({ product: "family-home-finance", resource: "receipt", transactionId: "tx-1" });
+    expect(metadata.appProperties).toMatchObject({ product: "family-task-finance", resource: "receipt", transactionId: "tx-1" });
     expect(fetchApi.mock.calls[1][0]).toBe("https://upload.example/session");
   });
 
