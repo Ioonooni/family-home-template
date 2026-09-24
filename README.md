@@ -115,6 +115,12 @@ npm run check
 
 CI ใน `.github/workflows/ci.yml` จะตรวจ lint, tests และ build อัตโนมัติทุก push/PR
 
+## Development Record
+
+The initial V1 was completed in **4 days**.
+
+This record is maintained as a personal benchmark for comparing future projects across delivery time, scope and technical complexity, rework, verification effort, and implementation quality.
+
 ## License
 
 MIT License — Copyright © 2026 IOON.
