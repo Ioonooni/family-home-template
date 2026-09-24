@@ -1,4 +1,4 @@
-# family-task
+# family-task-template
 
 เว็บแอปมือถือสำหรับจัดการงานบ้านและการเงินของครอบครัว โดยแยกขอบเขตข้อมูลของแต่ละโมดูลอย่างชัดเจน
 
@@ -7,8 +7,8 @@
 ## Try / Use This / Source
 
 - **Try** — ยังไม่เผยแพร่ public demo โดยตั้งใจ เพราะ deployment ใช้งานจริงของเจ้าของเป็น private instance และไม่ควรถูกใช้เป็น demo สาธารณะ
-- **Use This** — ใช้ปุ่ม **Use this template** ของ repository นี้ หรือเปิด `https://github.com/Ioonooni/family-home-template/generate` แล้วเชื่อมต่อ Supabase และ Google ของผู้ใช้เอง
-- **Source** — `https://github.com/Ioonooni/family-home-template`
+- **Use This** — ใช้ปุ่ม **Use this template** ของ repository นี้ หรือเปิด `https://github.com/Ioonooni/family-task-template/generate` แล้วเชื่อมต่อ Supabase และ Google ของผู้ใช้เอง
+- **Source** — `https://github.com/Ioonooni/family-task-template`
 
 > สำเนาของผู้ใช้ต้องใช้ Supabase, Google Drive, Google Sheets และ deployment environment ของตนเอง ห้ามชี้กลับไปยัง resource ของเจ้าของโปรเจกต์
 
